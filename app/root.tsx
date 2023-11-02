@@ -15,7 +15,7 @@ import {
 
 import appStylesHref from './app.css';
 import { getContacts, createEmptyContact } from './data';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export const action = async () => {
   const contact = await createEmptyContact();
@@ -36,12 +36,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function App() {
   const { contacts, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
+  // the query now needs to be kept in state
+  const [query, setQuery] = useState(q || '');
 
+  // we still have a `useEffect` to synchronize the query
+  // to the component state on back/forward button clicks
   useEffect(() => {
-    const searchField = document.getElementById('q');
-    if (searchField instanceof HTMLInputElement) {
-      searchField.value = q || '';
-    }
+    setQuery(q || '');
   }, [q]);
 
   return (
@@ -60,10 +61,13 @@ export default function App() {
               <input
                 id="q"
                 aria-label="Search contacts"
-                defaultValue={q || ''}
                 placeholder="Search"
                 type="search"
                 name="q"
+                // synchronize user's input to component state
+                onChange={(event) => setQuery(event.currentTarget.value)}
+                // switched to `value` from `defaultValue`
+                value={query}
               />
               <div id="search-spinner" aria-hidden hidden={true} />
             </Form>
