@@ -15,6 +15,7 @@ import {
 
 import appStylesHref from './app.css';
 import { getContacts, createEmptyContact } from './data';
+import { useEffect } from 'react';
 
 export const action = async () => {
   const contact = await createEmptyContact();
@@ -35,6 +36,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function App() {
   const { contacts, q } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const searchField = document.getElementById('q');
+    if (searchField instanceof HTMLInputElement) {
+      searchField.value = q || '';
+    }
+  }, [q]);
 
   return (
     <html lang="en">
